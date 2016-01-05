@@ -1,0 +1,74 @@
+## INFO ##
+## INFO ##
+
+# Include rules
+include tuplet/Tuprules.tup
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# Global variables
+CPPPATH += -I$(INCLUDE_DIR)
+LIBPATH += -L$(LIBRARY_DIR)
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# Local variables
+lib = prelude
+
+
+#------------------------------------------------------------------------------#
+# Analyze sources
+: foreach $(SOURCE_DIR)/*.c $(INCLUDE_DIR)/prelude/*.h |> !analyze |>
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# Compile objects
+: foreach $(SOURCE_DIR)/*.c                                                    \
+    |> !to_obj                                                                 \
+    |> $(BUILD_DIR)/%B.$(OBJ_EXT) {lib_obj}
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# Build shared library
+: {lib_obj}                                                                    \
+    |> !to_lib                                                                 \
+    |> $(LIBRARY_DIR)/lib$(lib).$(LIB_EXT) {lib}
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# Build static library
+: {lib_obj}                                                                    \
+    |> !to_arc                                                                 \
+    |> $(LIBRARY_DIR)/lib$(lib).$(ARC_EXT) {arc}
+
+
+
+#------------------------------------------------------------------------------#
+# Analyze test sources
+: foreach tests/main-*.c |> !analyze |>
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# Compiler test sources into objects
+: foreach tests/main-*.c                                                       \
+    |> !to_obj                                                                 \
+    |> $(BUILD_DIR)/tests/%B.$(OBJ_EXT) {bin_obj}
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# Build test binaries
+LIBS  = -l$(lib)
+LIBS += -ljemalloc
+: foreach {bin_obj} | {lib}                                                    \
+    |> !to_bin $(LIBS)                                                         \
+    |> $(BINARY_DIR)/tests/%B$(BIN_EXT) {bin}
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+ENV_VARS = LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(LIBRARY_DIR)
+VALGRIND += --soname-synonyms=somalloc=*jemalloc*
+: foreach {bin} | {lib} |> !run_it |>
+
+
+
+#------------------------------------------------------------------------------#
+# Debug headers and sources (pre-processor output)
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+: foreach $(SOURCE_DIR)/*.c $(INCLUDE_DIR)/prelude/*.h                     \
+    |> !to_cpp                                                             \
+    |> $(BUILD_DIR)/cpp-out/%B.pp.%e
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+: foreach tests/main-*.c                                                   \
+    |> !to_cpp                                                             \
+    |> $(BUILD_DIR)/cpp-out/tests/%B.pp.%e
