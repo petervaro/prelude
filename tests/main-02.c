@@ -1,6 +1,10 @@
 /* INFO **
 ** INFO */
 
+/* TEST SWITCH */
+// #define PR_FAST 1
+/* TEST SWITCH */
+
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include standard headers */
 #include <stdio.h>
@@ -27,24 +31,29 @@ function(double number);
 int
 main(void)
 {
+    /* TODO: write proper tests! (eg. test invalid values) */
+
     double n,
-           number = 0.123456789;
+           number = 0.3333333333333333;
     double (*f)(double);
     pr_Pointer np,
                fp;
 
-    pr_Pointer_ini(np);
-    pr_Pointer_ini(fp);
+    pr_Pointer_ini(&np);
+    pr_Pointer_ini(&fp);
 
-    pr_Pointer_set_data(np, &number);
-    pr_Pointer_set_func(fp, function);
+    pr_Pointer_set_data(&np, &number);
+    pr_Pointer_set_func(&fp, function);
 
-    n = *(double *)pr_Pointer_get_data(np);
-    f = (double(*)(double))pr_Pointer_get_func(fp);
+    pr_Pointer_put(&np); puts("");
+    pr_Pointer_put(&fp); puts("");
+
+    n = *(double *)pr_Pointer_get_data(&np);
+    f = (double(*)(double))pr_Pointer_get_func(&fp);
     printf("%f\n", f(n));
 
-    pr_Pointer_fin(np);
-    pr_Pointer_fin(fp);
+    pr_Pointer_fin(&np);
+    pr_Pointer_fin(&fp);
     return EXIT_SUCCESS;
 }
 

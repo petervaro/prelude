@@ -5,25 +5,26 @@
 #ifndef PR_POINTER_H_4342666479125375
 #define PR_POINTER_H_4342666479125375 1
 
-/*  The ap_AllPtr is a convertible pointer data type capable of holding all
-    kinds of pointers in C while it is also strictly standard compilant and
-    portable. This header contains the necessary data types to implement such
-    feature and also a few macros, to interact with this type.
+/*  The pr_Pointer is a convertible pointer type capable of holding all kinds of
+    pointers in C while it is also strictly conforming and therefore portable.
+    This header contains the necessary types, their methods and macros to
+    implement such feature.
 
-    Rationale:  The plain old `void *` may or may not have the same size as a
-                function pointer, therefore it is not suitable for storing
-                function pointers. The standard clearly states, that only a
-                function pointer is capable of holding a pointer to a function.
-                However any function pointer can hold all other types of
-                function pointers (while this is perfectly legal, it worth
-                mentioning that if one wants to call the stored function in a
-                function pointer, one has to properly cast it first), therefore
-                a function pointer can and should be used parallel with a
-                `void *` to make a truly generic pointer type, and that's
-                exactly what `ap_AllPtr` does. */
+    The rationale behind this type is that the plain pointer to void may or may
+    not have the same size as a function pointer. (A pointer to void is only
+    capable of storing any type of object pointer, not function pointer. Also
+    the representation of a pointer to function is implementation defined.)
+    Therefore it is not conforming and portable to store pointer to function in
+    pointer to void. However the standard clearly states, that any pointer to a
+    function is capable of holding pointer to any kind of other function. (Even
+    then, the stored function should not be called until it is properly casted
+    first, otherwise it is undefined behaviour.) */
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include standard headers */
+#include <stdio.h>
+/*  type  : FILE
+    value : stdout */
 #include <stddef.h>
 /*  type  : size_t */
 
@@ -52,54 +53,83 @@
         };
     } pr_Pointer;
 
+    /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+    /*  Set pr_Pointer instance to store an object pointer.
+        Arguments : SELF => has to be non NULL (unhandled: PR_FAST)
+                    DATA => can be any type of object pointer and NULL
+        Return    : DATA casted to pointer to void. If PR_FAST is not defined,
+                    on error NULL will be returned
+        Prototype :
+            void*
+            pr_Pointer_ini_data(pr_Pointer *self,
+                                <object>    pointer); */
+    #ifdef PR_FAST
+        #define pr_Pointer_set_data(SELF, DATA)                                \
+            ((SELF)->type = pr_Pointer_DATA,                                   \
+             (SELF)->data = (void *)(DATA))
+    #else
+        #define pr_Pointer_set_data(SELF, DATA)                                \
+            ((SELF) ? ((SELF)->type = pr_Pointer_DATA,                         \
+                       (SELF)->data = (void *)(DATA))                          \
+                    : NULL)
+    #endif /* PR_FAST */
 
     /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-    /* void
-       pr_Pointer_ini(pr_Pointer self); */
-    #define pr_Pointer_ini(SELF) (SELF.type = pr_Pointer_NONE, (void)0)
+    /*  Set pr_Pointer instance to store a function pointer.
+        Arguments : SELF => has to be non NULL (unhandled: PR_FAST)
+                    FUNC => can be any type of function pointer and NULL
+        Return    : FUNC casted to pointer to function takes nothing and returns
+                    void. If PR_FAST is not defined, on error NULL will be
+                    returned
+        Prototype :
+            void (*)(void)
+            pr_Pointer_ini_data(pr_Pointer *self,
+                                <function> pointer); */
+    #ifdef PR_FAST
+        #define pr_Pointer_set_func(SELF, FUNC)                                \
+            ((SELF)->type = pr_Pointer_FUNC,                                   \
+             (SELF)->func = (void(*)(void))(FUNC))
+    #else
+       #define pr_Pointer_set_func(SELF, FUNC)                                 \
+            ((SELF) ? ((SELF)->type = pr_Pointer_FUNC,                         \
+                       (SELF)->func = (void(*)(void))(FUNC))                   \
+                    : NULL)
+    #endif /* PR_FAST */
 
     /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-    /* void
-       pr_Pointer_fin(pr_Pointer self); */
-    #define pr_Pointer_fin(SELF) pr_Pointer_ini(SELF)
+    /*  Get object pointer stored in pr_Pointer instance.
+        Arguments : SELF => has to be non NULL (unhandled: PR_FAST)
+        Return    : pointer to object, casted to pointer to void. If PR_FAST is
+                    not defined, on error NULL will be returned
+        Prototype :
+            void*
+            pr_Pointer_get_data(const pr_Pointer *self); */
+    #ifdef PR_FAST
+        #define pr_Pointer_get_data(SELF) ((SELF)->data)
+    #else
+        #define pr_Pointer_get_data(SELF)                                      \
+            ((SELF) ? ((SELF)->type == pr_Pointer_DATA ? (SELF)->data          \
+                                                       : NULL)                 \
+                    : NULL)
+    #endif /* PR_FAST */
 
     /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-    /* void*
-       pr_Pointer_ini_data(pr_Pointer self,
-                           <pointer>  data); */
-    #define pr_Pointer_set_data(SELF, DATA)                                    \
-        (SELF.type = pr_Pointer_DATA,                                          \
-         SELF.data = (void *)(DATA))
-
-    /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-    /* void (*)(void)
-       pr_Pointer_ini_data(pr_Pointer self,
-                           <function> func); */
-    #define pr_Pointer_set_func(SELF, FUNC)                                    \
-        (SELF.type = pr_Pointer_FUNC,                                          \
-         SELF.func = (void (*)(void))(FUNC))
-
-    /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-    /* void*
-       pr_Pointer_get_data(pr_Pointer self); */
-    #define pr_Pointer_get_data(SELF)                                          \
-        (SELF.type == pr_Pointer_DATA ? SELF.data : NULL)
-
-    /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-    /* void (*)(void)
-       pr_Pointer_get_func(pr_Pointer self); */
-    #define pr_Pointer_get_func(SELF)                                          \
-        (SELF.type == pr_Pointer_FUNC ? SELF.func : NULL)
-
-    /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-    /* <pr_Pointer_NONE or pr_Pointer_DATA or pr_Pointer_FUNC>
-       pr_Pointer_get_type(pr_Pointer self); */
-    #define pr_Pointer_get_type(SELF) (SELF.type)
-
-/* C99 */
-#elif __STDC_VERSION__ >= 199901L
-
-/* C89 */
+    /*  Get function pointer stored in pr_Pointer instance.
+        Arguments : SELF => has to be non NULL (unhandled: PR_FAST)
+        Return    : pointer to function takes nothing and returns void. If
+                    PR_FAST is not defined, on error NULL will be returned
+        Prototype :
+            void (*)(void)
+            pr_Pointer_get_func(const pr_Pointer *self); */
+    #ifdef PR_FAST
+        #define pr_Pointer_get_func(SELF) ((SELF)->func)
+    #else
+        #define pr_Pointer_get_func(SELF)                                      \
+            ((SELF) ? ((SELF)->type == pr_Pointer_FUNC ? (SELF)->func          \
+                                                       : NULL)                 \
+                    : NULL)
+    #endif /* PR_FAST */
+/* C89 and C99 */
 #else
 
     /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -124,40 +154,190 @@
         pr__PointerValue value;
     } pr_Pointer;
 
+    /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+    /*  Set pr_Pointer instance to store an object pointer.
+        Arguments : SELF => has to be non NULL (unhandled: PR_FAST)
+                    DATA => can be any type of object pointer and NULL
+        Return    : DATA casted to pointer to void. If PR_FAST is not defined,
+                    on error NULL will be returned
+        Prototype :
+            void*
+            pr_Pointer_ini_data(pr_Pointer *self,
+                                <object>    pointer); */
+    #ifdef PR_FAST
+        #define pr_Pointer_set_data(SELF, DATA)                                \
+            ((SELF)->type       = pr_Pointer_DATA,                             \
+             (SELF)->value.data = (void *)(DATA))
+    #else
+        #define pr_Pointer_set_data(SELF, DATA)                                \
+            ((SELF) ? ((SELF)->type       = pr_Pointer_DATA,                   \
+                       (SELF)->value.data = (void *)(DATA))                    \
+                    : NULL)
+    #endif /* PR_FAST */
+
+    /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+    /*  Set pr_Pointer instance to store a function pointer.
+        Arguments : SELF => has to be non NULL (unhandled: PR_FAST)
+                    FUNC => can be any type of function pointer and NULL
+        Return    : FUNC casted to pointer to function takes nothing and returns
+                    void. If PR_FAST is not defined, on error NULL will be
+                    returned
+        Prototype :
+            void (*)(void)
+            pr_Pointer_ini_data(pr_Pointer *self,
+                                <function> pointer); */
+    #ifdef PR_FAST
+        #define pr_Pointer_set_func(SELF, FUNC)                                \
+            ((SELF)->type = pr_Pointer_FUNC,                                   \
+             (SELF)->func = (void(*)(void))(FUNC))
+    #else
+       #define pr_Pointer_set_func(SELF, FUNC)                                 \
+            ((SELF) ? ((SELF)->type       = pr_Pointer_FUNC,                   \
+                       (SELF)->value.func = (void(*)(void))(FUNC))             \
+                    : NULL)
+    #endif /* PR_FAST */
+
+    /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+    /*  Get object pointer stored in pr_Pointer instance.
+        Arguments : SELF => has to be non NULL (unhandled: PR_FAST)
+        Return    : pointer to object, casted to pointer to void. If PR_FAST is
+                    not defined, on error NULL will be returned
+        Prototype :
+            void*
+            pr_Pointer_get_data(const pr_Pointer *self); */
+    #ifdef PR_FAST
+        #define pr_Pointer_get_data(SELF) ((SELF)->value.data)
+    #else
+        #define pr_Pointer_get_data(SELF)                                      \
+            ((SELF) ? ((SELF)->type == pr_Pointer_DATA ? (SELF)->value.data    \
+                                                       : NULL)                 \
+                    : NULL)
+    #endif /* PR_FAST */
+
+    /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+    /*  Get function pointer stored in pr_Pointer instance.
+        Arguments : SELF => has to be non NULL (unhandled: PR_FAST)
+        Return    : pointer to function takes nothing and returns void. If
+                    PR_FAST is not defined, on error NULL will be returned
+        Prototype :
+            void (*)(void)
+            pr_Pointer_get_func(const pr_Pointer *self); */
+    #ifdef PR_FAST
+        #define pr_Pointer_get_func(SELF) ((SELF)->value.func)
+    #else
+        #define pr_Pointer_get_func(SELF)                                      \
+            ((SELF) ? ((SELF)->type == pr_Pointer_FUNC ? (SELF)->value.func    \
+                                                       : NULL)                 \
+                    : NULL)
+    #endif /* PR_FAST */
+
 #endif /* __STDC_VERSION__ */
 
+
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-size_t
+/*  Initialize pr_Pointer instance, if PR_FAST is not defined.
+    Arguments : SELF => has to be non NULL
+    Return    : void
+    Prototype :
+        void
+        pr_Pointer_ini(pr_Pointer *self); */
+#ifdef PR_FAST
+    #define pr_Pointer_ini(SELF) ((void)0)
+#else
+    #define pr_Pointer_ini(SELF) \
+        ((void)((SELF) ? ((SELF)->type = pr_Pointer_NONE) : 0))
+#endif /* PR_FAST */
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/*  Finalize pr_Pointer instance, if PR_FAST is not defined.
+    Arguments : SELF => has to be non NULL
+    Return    : void
+    Prototype :
+        void
+        pr_Pointer_fin(pr_Pointer *self); */
+#define pr_Pointer_fin(SELF) pr_Pointer_ini(SELF)
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/*  Get pointer type stored in pr_Pointer instance.
+    Arguments : SELF => has to be non NULL (unhandled: PR_FAST)
+    Return    : pr_Pointer_NONE => nothing is stored or self is NULL
+                pr_Pointer_DATA => object pointer is stored
+                pr_Pointer_FUNC => function pointer is stored
+    Prototype :
+        <pr__PointerType> // type only has name if standard < C11
+        pr_Pointer_get_type(const pr_Pointer *self); */
+#ifdef PR_FAST
+    #define pr_Pointer_get_type(SELF) ((SELF)->type)
+#else
+    #define pr_Pointer_get_type(SELF) \
+        ((SELF) ? ((SELF)->type) : pr_Pointer_NONE)
+#endif /* PR_FAST */
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/*  Get the string representation of a pr_Pointer instance
+    Arguments : self => has to be non NULL (unhandled: PR_FAST)
+    Return    : a globally available constant pointer */
+const char*
 pr_Pointer_str(const pr_Pointer *self);
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/*  Write qualified string representation of pr_Pointer instance to 'stdout'.
+    Arguments : self   => has to be non NULL (unhandled: PR_FAST)
+    Return    : the number of bytes that has been written to 'stdout'
+    Prototype :
+        size_t
+        pr_Pointer_put(const pr_Pointer *self) */
+#define pr_Pointer_put(SELF) pr_Pointer_fput((SELF), stdout)
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/*  Write qualified string representation of pr_Pointer instance to 'stream'.
+    Arguments : self   => has to be non NULL (unhandled: PR_FAST)
+                stream => has to be non NULL (unhandled: PR_FAST)
+    Return    : the number of bytes that has been written to 'stream' */
 size_t
 pr_Pointer_fput(const pr_Pointer *self,
                 FILE             *stream);
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-size_t
-pr_Pointer_put(const pr_Pointer *self);
-
-/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/*  Write qualified string representation of pr_Pointer instance to 'buffer'. It
+    is guaranteed that if there were no errors, the string in the buffer will be
+    null terminated.
+    Arguments : self   => has to be non NULL (unhandled: PR_FAST)
+                length => has to be greater than 0 (unhandled: PR_FAST)
+                stream => has to be non NULL (unhandled: PR_FAST)
+    Return    : the number of bytes that has been written to 'stream' */
 size_t
 pr_Pointer_sput(const pr_Pointer *self,
                 size_t            length,
                 char             *buffer);
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Return : necessary buffer size able to store qualified string
+            representation of pointer */
 size_t
 pr_Pointer_sput_len(const pr_Pointer *self);
 
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* TODO: find a away to tell the max value during compilation */
+/* This value represents the maximum buffer length required to store the
+   qualified representation of pointer */
+// #define PR_POINTER_MAX_SPUT_LEN ((size_t)259)
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-/* Return : pr_EQUAL              => the two pointers are the same
-            pr_NOT_EQUAL          => the two pointers are not the same
-            pr_UNCOMPARABLE       => pointers have different types
-            pr_UNCOMPARABLE_LEFT  => self is NULL
-            pr_UNCOMPARABLE_RIGHT => other is NULL */
+/*  Compare two pr_Pointer instances to each other.
+    Arguments : self  => has to be non NULL
+                other => has to be non NULL
+    Return    : pr_EQUAL              => the two pointers are the same
+                pr_NOT_EQUAL          => the two pointers are not the same
+                pr_UNCOMPARABLE_LEFT  => self is NULL
+                pr_UNCOMPARABLE_RIGHT => other is NULL
+                pr_UNCOMPARABLE       => pointers have different types or
+                                         pointers' type is invalid */
 pr_Order
 pr_Pointer_cmp(const pr_Pointer *self,
                const pr_Pointer *other);
+
+/* TODO: add pr_Pointer_bool() and pr_Pointer_hash() methods */
 
 #endif /* PR_POINTER_H_4342666479125375 */
