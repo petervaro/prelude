@@ -1,18 +1,96 @@
+![[license: GPLv3]](https://img.shields.io/badge/license-GNU_General_Public_License_v3.0-blue.svg)
+![[standard: ISO C11]](https://img.shields.io/badge/standard-ISO_C11-lightgrey.svg)
+
+- - -
+
 ![prelude](img/logo.png?raw=true "logo")
 
 `prelude` is a tiny package, that contains essential definitions for
 higher-level but low-cost abstractions in C. It is conforming and portable.
 The types, their methods and unified values can be used to decide comparison
-ordering; to indicate proxy objects' ownership on their members; to store
+ordering; to indicate *proxy* objects' ownership of their members; to store
 any pointer in a truly generic pointer type; and to pass message along with the
-scalar expression to assert.
+scalar expression to an assertion.
 
-- Dependencies
-- Installation
+- [Dependencies](#dependencies)
+- [Install](#install)
+- [Uninstall](#uninstall)
 - [Comparison Order](#comparison-order)
 - [Ownership of Members](#ownership-of-members)
 - [Generic Pointer](#generic-pointer)
 - [Assertion](#assertion)
+- [License](#license)
+
+
+
+Dependencies
+------------
+
+> **SUPPORTED PLATFORMS:** `prelude` is currently supported only on UNIX-like
+> systems (Linux, BSD, OS X, etc.), but Windows support (via
+> [mingw-w64](http://mingw-w64.org/doku.php)) is on its way!
+
+<!-- -->
+> **SUPPORTED STANDARDS:** `prelude` requires C99 or later (C11 recommended)
+
+**End-user dependencies**:
+
+- [git](https://git-scm.com) *(2.6.4+)*
+- [gcc](https://gcc.gnu.org) *(5.3.0+)* or
+  [clang](http://clang.llvm.org) *(3.7.0+)*
+- [ar](https://www.gnu.org/software/binutils) *(2.25.1)+*
+- [bash](https://www.gnu.org/software/bash) *(4.3.42+)*
+
+**Developer dependencies**:
+
+- [git](https://git-scm.com) *(2.6.4+)*
+- [gcc](https://gcc.gnu.org) *(5.3.0+)*
+- [clang](http://clang.llvm.org) *(3.7.0+)*
+- [ar](https://www.gnu.org/software/binutils) *(2.25.1)+*
+- [bash](https://www.gnu.org/software/bash) *(4.3.42+)*
+- [valgrind](http://valgrind.org) *(3.11.0+)*
+- [clang-analyzer](http://clang-analyzer.llvm.org)  *(3.7.0+)*
+- [tup](http://gittup.org/tup) *(0.7.3+)*
+- [jemalloc](http://www.canonware.com/jemalloc) *(4.0.4+)*
+
+
+
+Install
+-------
+
+For further details and settings run:
+
+```bash
+bash install.sh --help
+```
+
+**Build and install**
+
+```bash
+$ git clone --recursive https://github.com/petervaro/prelude.git
+$ cd prelude
+$ bash install.sh
+```
+
+**Developer build and tests**
+
+```bash
+$ git clone --recursive https://github.com/petervaro/prelude.git
+$ cd prelude
+$ bash tuplet/setup.sh
+$ tup init
+$ tup
+```
+
+
+Uninstall
+---------
+
+```bash
+$ bash install.sh --remove
+```
+
+
 
 Comparison Order
 ----------------
@@ -24,13 +102,15 @@ ordering constant.
 The ordering constants are unique and can be used in both conditional statements
 and bit-mask unfolding.
 
-**Usage**
+**Usage:**
 
 ```C
 #include <prelude/order.h>
 ```
 
-**Available `pr_Order` constants**
+And link against either `libprelude.so` or `libprelude.a`.
+
+**Available `pr_Order` constants:**
 
 - `pr_EQUAL`: indicates that left and right values are equal
 - `pr_NOT_EQUAL`: indicates that left and right values are not equal
@@ -166,12 +246,13 @@ Specifies the maximum size of a buffer which is big enough to contain any
 possible outputs of the `pr_Order_sput` method.
 
 
+
 Ownership of Members
 --------------------
 
-The `pr_Ownership` type can be used to indicate ownership over members of a
-complex, user-defined, proxy data type. The type is guaranteed to be an
-unsingned integer type, capable of storing a single or more bitmasked ownership
+The `pr_Ownership` type can be used to indicate ownership of members of complex,
+user-defined, *proxy* data types. The type is guaranteed to be an unsingned
+integer type, capable of storing a single or bitmasked (or'd) ownership
 constants.
 
 In practice, `pr_Ownership` is a way of storing which pointers of the owner
@@ -185,6 +266,8 @@ can be allocated completely statically or completely dynamically or mixed.
 ```C
 #include <prelude/ownership.h>
 ```
+
+And link against either `libprelude.so` or `libprelude.a`.
 
 **Available `pr_Ownership` constants:**
 
@@ -276,7 +359,7 @@ Calculates and returns the size of the buffer which is required to store the
 qualified representation of the passed ownership. The returned value contains
 the NULL-termination.
 
-**Other constants**
+**Other constants:**
 
 ```C
 #define PR_OWNERSHIP_MAX_SPUT_LEN
@@ -285,23 +368,213 @@ Specifies the maximum size of a buffer which is big enough to contain any
 possible outputs of the `pr_Ownership_sput` method.
 
 
+
 Generic Pointer
 ---------------
 
-> **TODO:** Write documentation for this type!
+The `pr_Pointer` is a convertible pointer type capable of holding all kinds of
+pointers in C, while it is also strictly conforming and therefore portable.
+This header contains the necessary types, their methods and macros to implement
+such feature.
+
+The rationale behind this type is that the plain pointer to `void` may or may
+not have the same size as a function pointer. (A pointer to `void` is only
+capable of storing any type of object pointer, not function pointer. Also the
+representation of a pointer to function is implementation defined.) Therefore it
+is not conforming and portable to store pointer to function in pointer to
+`void`. However the standard clearly states, that any pointer to a function is
+capable of holding pointer to any kind of other function. (Even then, the stored
+function should not be called until it is properly casted first, otherwise it is
+undefined behaviour.)
+
+**Usage:**
+
+```C
+#include <prelude/pointer.h>
+```
+
+And link against either `libprelude.so` or `libprelude.a`.
+
+**Available constants:**
+
+- `pr_Pointer_NONE`: instance it is empty
+- `pr_Pointer_DATA`: instance is storing an object pointer
+- `pr_Pointer_FUNC`: instance is storing a function pointer
+
+**Available methods on `pr_Pointer`:**
+
+```C
+void
+pr_Pointer_ini(pr_Pointer *self);
+```
+Initializes `pr_Pointer` instance, if `PR_FAST` is not defined. If `self` is
+`NULL` nothing will happen.
+
+```C
+void
+pr_Pointer_fin(pr_Pointer *self);
+```
+Finalizes `pr_Pointer` instance, if PR_FAST is not defined. If `self` is
+`NULL` nothing will happen.
+
+```C
+void*
+pr_Pointer_ini_data(pr_Pointer *self,
+                    <object>    pointer);
+```
+Sets `pr_Pointer` instance to store an object pointer. The `pointer` can be any
+object pointer and `NULL`. If `self` is `NULL`, the method will return `NULL`,
+indicating that it can't work properly. It returns the passed object pointer
+casted to `void*`.
+
+If `PR_FAST` is defined, no error checking will happen.
+
+```C
+void (*)(void)
+pr_Pointer_ini_data(pr_Pointer *self,
+                    <function>  pointer)
+```
+Sets `pr_Pointer` instance to store a function pointer. The `pointer` can be any
+function pointer and `NULL`. If `self` is `NULL`, the method will return `NULL`,
+indicating that it can't work properly. It returns the passed function pointer
+casted to `void(*)(void)`.
+
+If `PR_FAST` is defined, no error checking will happen.
+
+```C
+void*
+pr_Pointer_get_data(const pr_Pointer *self);
+```
+Get object pointer stored in `pr_Pointer` instance. If `self` is `NULL` or
+`self` is not storing anything or storing a function pointer, the method will
+return `NULL`, indicating that it can't work properly. It returns the stored
+object pointer casted to `void*`.
+
+If `PR_FAST` is defined, no error checking will happen.
+
+```C
+void (*)(void)
+pr_Pointer_get_func(const pr_Pointer *self);
+```
+Get function pointer stored in `pr_Pointer` instance. If `self` is `NULL` or
+`self` is not storing anything or storing an object pointer, the method will
+return `NULL`, indicating that it can't work properly. It returns the stored
+function pointer casted to `void(*)(void)`.
+
+If `PR_FAST` is defined, no error checking will happen.
+
+```C
+<pr__PointerType> // the type has no name under ISO C11
+pr_Pointer_get_type(const pr_Pointer *self);
+```
+Gets pointer's type stored in `pr_Pointer` instance. If `self` is NULL, or the
+instance does not store anything `pr_Pointer_NONE` will be returned, otherwise
+if stored object is an object pointer `pr_Pointer_DATA`, if it is a function
+pointer `pr_Pointer_FUNC` will be defined.
+
+If `PR_FAST` is defined, no error checking will happen.
+
+```C
+const char*
+pr_Pointer_str(const pr_Pointer *self);
+```
+Gets the string representation of a `pr_Pointer` instance. If `self` is `NULL`,
+`NULL` will be returned.
+
+If `PR_FAST` is defined, no error checking will happen.
+
+```C
+size_t
+pr_Pointer_put(const pr_Pointer *self);
+```
+Writes qualified string representation of `pr_Pointer` instance to `stdout`. If
+`self` is `NULL` it will not write anything and returns `0`. Otherwise it will
+return the number of bytes written to the file stream.
+
+If `PR_FAST` is defined, no error checking will happen.
+
+```C
+size_t
+pr_Pointer_fput(const pr_Pointer *self,
+                FILE             *stream);
+```
+Writes qualified string representation of `pr_Pointer` instance to `sream`. If
+`self` is `NULL` it will not write anything and returns `0`. Otherwise it will
+return the number of bytes written to the file stream, null termination
+character excluded.
+
+If `PR_FAST` is defined, no error checking will happen.
+
+```C
+size_t
+pr_Pointer_sput(const pr_Pointer *self,
+                size_t            length,
+                char             *buffer);
+```
+Writes qualified string representation of `pr_Pointer` instance to `sream`. If
+`self` or `buffer` is `NULL` or `length` is `0` it will not write anything and
+returns `0`. Otherwise it will return the number of bytes written to the file
+stream, null termination character included.
+
+If `PR_FAST` is defined, no error checking will happen.
+
+```C
+size_t
+pr_Pointer_sput_len(const pr_Pointer *self);
+```
+Returns the necessary buffer size able to store qualified string representation
+of the `pr_Pointer` instance.
+
+```C
+pr_Order
+pr_Pointer_cmp(const pr_Pointer *self,
+               const pr_Pointer *other);
+```
+Compares two `pr_Pointer` instances to each other. Returns a
+[`pr_Order`](#comparison-order) constant, which can be:
+
+| case                               | returned                |
+|------------------------------------|-------------------------|
+| the two pointers are the same      | `pr_EQUAL`              |
+| the two pointers are not the same  | `pr_NOT_EQUAL`          |
+| `self` is `NULL`                   | `pr_UNCOMPARABLE_LEFT`  |
+| `other` is `NULL`                  | `pr_UNCOMPARABLE_RIGHT` |
+| different or invalid pointer types | `pr_UNCOMPARABLE`       |
+
+```C
+bool
+pr_Pointer_bool(const pr_Pointer *self);
+```
+> This method is currently not implemented.
+
+```C
+unsigned long long
+pr_Pointer_hash(const pr_Pointer *self);
+```
+> This method is currently not implemented.
+
+**Other constants:**
+
+```C
+#define PR_POINTER_MAX_SPUT_LEN
+```
+> This constant is currently not implemented.
 
 
 
 Assertion
 ---------
 
-**Usage**
+**Usage:**
 
 ```C
 #include <prelude/assert.h>
 ```
 
-**Available macros**
+> **NOTE:** Using this header alone does not require to link against either
+> `libprelude.a` or `libprelude.so`.
+
+**Available macros:**
 
 ```C
 void pr_assert(<scalar>    expression,
@@ -321,9 +594,6 @@ Works the same as `pr_assert_x`, except it takes the expression as a string for
 its second argument. This form can be be used, to prevent macro replacement,
 when `pr_assert_x` is wrapped with a macro.  The `expression_string` should not
 be a pointer to `NULL`.
-
-> **NOTE:** Using this header alone does not require to link against either
-> `libprelude.a` or `libprelude.so`.
 
 
 

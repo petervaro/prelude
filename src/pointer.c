@@ -2,6 +2,17 @@
 ** INFO */
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Include standard headers */
+#include <stdio.h>
+/*  type  : FILE
+    value : stdout
+    func  : snprintf
+            fputs */
+#include <stddef.h>
+/*  type  : size_t
+    const : NULL */
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include prelude headers */
 #include "prelude/order.h"
 /*  type  : pr_Order

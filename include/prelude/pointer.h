@@ -6,7 +6,7 @@
 #define PR_POINTER_H_4342666479125375 1
 
 /*  The pr_Pointer is a convertible pointer type capable of holding all kinds of
-    pointers in C while it is also strictly conforming and therefore portable.
+    pointers in C, while it is also strictly conforming and therefore portable.
     This header contains the necessary types, their methods and macros to
     implement such feature.
 
@@ -84,7 +84,7 @@
         Prototype :
             void (*)(void)
             pr_Pointer_ini_data(pr_Pointer *self,
-                                <function> pointer); */
+                                <function>  pointer); */
     #ifdef PR_FAST
         #define pr_Pointer_set_func(SELF, FUNC)                                \
             ((SELF)->type = pr_Pointer_FUNC,                                   \
@@ -258,7 +258,7 @@
 #define pr_Pointer_fin(SELF) pr_Pointer_ini(SELF)
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-/*  Get pointer type stored in pr_Pointer instance.
+/*  Get pointer's type stored in pr_Pointer instance.
     Arguments : SELF => has to be non NULL (unhandled: PR_FAST)
     Return    : pr_Pointer_NONE => nothing is stored or self is NULL
                 pr_Pointer_DATA => object pointer is stored
@@ -287,7 +287,7 @@ pr_Pointer_str(const pr_Pointer *self);
     Return    : the number of bytes that has been written to 'stdout'
     Prototype :
         size_t
-        pr_Pointer_put(const pr_Pointer *self) */
+        pr_Pointer_put(const pr_Pointer *self); */
 #define pr_Pointer_put(SELF) pr_Pointer_fput((SELF), stdout)
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -303,8 +303,7 @@ pr_Pointer_fput(const pr_Pointer *self,
 /*  Write qualified string representation of pr_Pointer instance to 'buffer'. It
     is guaranteed that if there were no errors, the string in the buffer will be
     null terminated.
-    Arguments : self   => has to be non NULL (unhandled: PR_FAST)
-                length => has to be greater than 0 (unhandled: PR_FAST)
+    Arguments : length => has to be greater than 0 (unhandled: PR_FAST)
                 stream => has to be non NULL (unhandled: PR_FAST)
     Return    : the number of bytes that has been written to 'stream' */
 size_t
@@ -332,8 +331,7 @@ pr_Pointer_sput_len(const pr_Pointer *self);
                 pr_NOT_EQUAL          => the two pointers are not the same
                 pr_UNCOMPARABLE_LEFT  => self is NULL
                 pr_UNCOMPARABLE_RIGHT => other is NULL
-                pr_UNCOMPARABLE       => pointers have different types or
-                                         pointers' type is invalid */
+                pr_UNCOMPARABLE       => different or invalid pointer types */
 pr_Order
 pr_Pointer_cmp(const pr_Pointer *self,
                const pr_Pointer *other);
