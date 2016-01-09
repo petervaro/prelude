@@ -6,11 +6,11 @@
 ![prelude](img/logo.png?raw=true "logo")
 
 `prelude` is a tiny package, that contains essential definitions for
-higher-level but low-cost abstractions in C. It is conforming and portable.
-The types, their methods and unified values can be used to decide comparison
-ordering; to indicate *proxy* objects' ownership of their members; to store
-any pointer in a truly generic pointer type; and to pass message along with the
-scalar expression to an assertion.
+higher-level but low-cost abstractions in strictly conforming C. The types,
+their methods and unified values can be used to decide comparison ordering; to
+indicate *proxy* objects' ownership of their members; to store any pointer in a
+truly generic pointer type; and to pass message along with the scalar expression
+to an assertion.
 
 - [Dependencies](#dependencies)
 - [Install](#install)
@@ -35,23 +35,23 @@ Dependencies
 
 **End-user dependencies**:
 
-- [git](https://git-scm.com) *(2.6.4+)*
-- [gcc](https://gcc.gnu.org) *(5.3.0+)* or
-  [clang](http://clang.llvm.org) *(3.7.0+)*
-- [ar](https://www.gnu.org/software/binutils) *(2.25.1)+*
-- [bash](https://www.gnu.org/software/bash) *(4.3.42+)*
+- [git](https://git-scm.com) *(recommended: 2.6.4+)*
+- [gcc](https://gcc.gnu.org) *(recommended: 5.3.0+)* or
+  [clang](http://clang.llvm.org) *(recommended: 3.7.0+)*
+- [ar](https://www.gnu.org/software/binutils) *(recommended: 2.25.1+)*
+- [bash](https://www.gnu.org/software/bash) *(recommended: 4.3.42+)*
 
 **Developer dependencies**:
 
-- [git](https://git-scm.com) *(2.6.4+)*
-- [gcc](https://gcc.gnu.org) *(5.3.0+)*
-- [clang](http://clang.llvm.org) *(3.7.0+)*
-- [ar](https://www.gnu.org/software/binutils) *(2.25.1)+*
-- [bash](https://www.gnu.org/software/bash) *(4.3.42+)*
-- [valgrind](http://valgrind.org) *(3.11.0+)*
-- [clang-analyzer](http://clang-analyzer.llvm.org)  *(3.7.0+)*
-- [tup](http://gittup.org/tup) *(0.7.3+)*
-- [jemalloc](http://www.canonware.com/jemalloc) *(4.0.4+)*
+- [git](https://git-scm.com) *(recommended: 2.6.4+)*
+- [gcc](https://gcc.gnu.org) *(recommended: 5.3.0+)*
+- [clang](http://clang.llvm.org) *(recommended: 3.7.0+)*
+- [ar](https://www.gnu.org/software/binutils) *(recommended: 2.25.1+)*
+- [bash](https://www.gnu.org/software/bash) *(recommended: 4.3.42+)*
+- [valgrind](http://valgrind.org) *(recommended: 3.11.0+)*
+- [clang-analyzer](http://clang-analyzer.llvm.org)  *(recommended: 3.7.0+)*
+- [tup](http://gittup.org/tup) *(recommended: 0.7.3+)*
+- [jemalloc](http://www.canonware.com/jemalloc) *(recommended: 4.0.4+)*
 
 
 
@@ -171,8 +171,8 @@ if (order & pr_UNCOMPARABLE)
 const char*
 pr_Order_str(pr_Order self);
 ```
-Returns the string representation of a contant as a NULL-terminated static and
-constant C string. For example: `pr_Equal` will be written as `"pr_Equal"`. If
+Returns the string representation of a contant as a null terminated static and
+constant C string. For example: `pr_EQUAL` will be written as `"pr_EQUAL"`. If
 the passed value to this function is not a valid constant, it will return
 `"(UNKNOWN)"`.
 
@@ -183,7 +183,7 @@ pr_Order_put(pr_Order self);
 ```
 Writes *qualified* string representation of a constant to the `stdout` file
 stream. Returns the number of bytes that has been successfully written to the
-stream. For example: `pr_Equal` -> `<pr_Order pr_Equal>`. If the value passed to
+stream. For example: `pr_EQUAL` -> `<pr_Order pr_EQUAL>`. If the value passed to
 this method is not a valid `pr_Order` constant, the method will write
 `<pr_Order (UNKNOWN)>`.
 
@@ -207,7 +207,7 @@ Same as `pr_Order_put`, except it writes the representation to a `length` size
 `char` buffer. It will write as many bytes as it can before it hits the bound of
 the passed buffer or reaches the end of the representation. If `buffer` is not
 `NULL` and `length` is not `0` it is guaranteed that the string in the buffer
-will be a NULL-terminated C string.
+will be a null terminated C string.
 
 
 ```C
@@ -216,7 +216,7 @@ pr_Order_sput_len(pr_Order self);
 ```
 Calculates and returns the size of the buffer which is required to store the
 qualified representation of the passed order. The returned value contains the
-NULL-termination.
+null termination.
 
 
 ```C
@@ -228,7 +228,7 @@ value.
 
 | original                 | negated                  |
 |--------------------------|--------------------------|
-| `pr_Equal`               | `pr_NOT_EQUAL`           |
+| `pr_EQUAL`               | `pr_NOT_EQUAL`           |
 | `pr_NOT_EQUAL`           | `pr_EQUAL`               |
 | `pr_GREATER`             | `pr_LESSER`              |
 | `pr_LESSER`              | `pr_GREATER`             |
@@ -311,7 +311,7 @@ Then it may define the following preprocessor contants:
 const char*
 pr_Ownership_str(pr_Ownership self);
 ```
-Returns the string representation of ownership as a NULL-terminated static and
+Returns the string representation of ownership as a null terminated static and
 constant C string.  For example: `pr_OWNS_NONE` will be written as
 `"pr_OWNS_NONE"`. If the passed value to this method is not a valid constant, it
 will write `"(UNKNOWN)"`. Because `pr_Ownership` can be a bit-masked value, this
@@ -349,7 +349,7 @@ Same as `pr_Ownership_put`, except it writes the representation to a length size
 char buffer. It will write as many bytes as it can before it hits the bound of
 the passed buffer or reaches the end of the representation. If buffer is not
 `NULL` and length is not `0` it is guaranteed that the string in the buffer will
-be a NULL-terminated C string.
+be a null terminated C string.
 
 ```C
 size_t
@@ -357,7 +357,7 @@ pr_Ownership_sput_len(pr_Ownership self);
 ```
 Calculates and returns the size of the buffer which is required to store the
 qualified representation of the passed ownership. The returned value contains
-the NULL-termination.
+the null termination.
 
 **Other constants:**
 
@@ -377,15 +377,14 @@ pointers in C, while it is also strictly conforming and therefore portable.
 This header contains the necessary types, their methods and macros to implement
 such feature.
 
-The rationale behind this type is that the plain pointer to `void` may or may
-not have the same size as a function pointer. (A pointer to `void` is only
-capable of storing any type of object pointer, not function pointer. Also the
-representation of a pointer to function is implementation defined.) Therefore it
-is not conforming and portable to store pointer to function in pointer to
-`void`. However the standard clearly states, that any pointer to a function is
-capable of holding pointer to any kind of other function. (Even then, the stored
-function should not be called until it is properly casted first, otherwise it is
-undefined behaviour.)
+The rationale behind this type is that it is not guaranteed for a plain pointer
+to `void` to have the same size and/or representation as a function pointer.
+(A pointer to `void` is only capable of storing any type of object pointer.)
+Therefore it is not strictly conforming to store a pointer to function in a
+pointer to `void`. However the standard clearly states, that any pointer to a
+function is capable of holding pointer to any kind of other function. (Even
+then, the stored function should not be called until it is properly casted
+first to its original type, otherwise it is undefined behaviour.)
 
 **Usage:**
 

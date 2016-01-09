@@ -96,7 +96,7 @@ pr_Pointer_fput(const pr_Pointer *self,
     #ifndef PR_FAST
         /* If stream is NULL */
         if (!stream)
-            return (size_t)0;
+            return 0;
         /* If self is NULL */
         else if (!self)
         {
@@ -117,7 +117,7 @@ pr_Pointer_fput(const pr_Pointer *self,
             result = fprintf(stream, PR_TYPE_PREFIX "pr_Pointer_DATA"
                              PR_DATA_INFIX "%p" PR_TYPE_SUFFIX,
                              PR_GET(self, data));
-            return result > 0 ? (size_t)result : (size_t)0;
+            return result > 0 ? (size_t)result : 0;
 
         case pr_Pointer_FUNC:
             fputs(PR_TYPE_PREFIX "pr_Pointer_FUNC"
@@ -139,16 +139,17 @@ pr_Pointer_sput(const pr_Pointer *self,
                 size_t            length,
                 char             *buffer)
 {
+    int result;
+
     #ifndef PR_FAST
         /* If length is 0 or buffer is NULL */
         if (!length ||
             !buffer)
-                return (size_t)0;
+                return 0;
         /* If self is NULL */
         else if (!self)
-            return (size_t)snprintf(buffer,
-                                    length,
-                                    PR_PREFIX "(NULL)" PR_SUFFIX);
+            result = snprintf(buffer, length, PR_PREFIX "(NULL)" PR_SUFFIX);
+        else
     #endif
 
     /* TODO: replace fprintf with pp_Pointer_fput() and
@@ -156,30 +157,31 @@ pr_Pointer_sput(const pr_Pointer *self,
     switch (PR_GET_TYPE(self))
     {
         case pr_Pointer_NONE:
-            return (size_t)snprintf(buffer,
-                                    length,
-                                    PR_TYPE_PREFIX "pr_Pointer_NONE"
-                                        PR_TYPE_SUFFIX);
+            result = snprintf(buffer, length,
+                              PR_TYPE_PREFIX "pr_Pointer_NONE" PR_TYPE_SUFFIX);
+            break;
 
         case pr_Pointer_DATA:
-            return (size_t)snprintf(buffer,
-                                    length,
-                                    PR_TYPE_PREFIX "pr_Pointer_DATA"
-                                        PR_DATA_INFIX "%p" PR_TYPE_SUFFIX,
-                                    PR_GET(self, data));
+            result = snprintf(buffer, length,
+                              PR_TYPE_PREFIX "pr_Pointer_DATA"
+                                  PR_DATA_INFIX "%p" PR_TYPE_SUFFIX,
+                                  PR_GET(self, data));
+            break;
 
         case pr_Pointer_FUNC:
-            return (size_t)snprintf(buffer,
-                                    length,
-                                    PR_TYPE_PREFIX "pr_Pointer_FUNC"
-                                        PR_FUNC_INFIX "(function)"
-                                        PR_TYPE_SUFFIX);
+            result = snprintf(buffer, length,
+                              PR_TYPE_PREFIX "pr_Pointer_FUNC"
+                                  PR_FUNC_INFIX "(function)"
+                                  PR_TYPE_SUFFIX);
+            break;
 
         default:
-            return (size_t)snprintf(buffer,
-                                    length,
-                                    PR_TYPE_PREFIX "(UNKNOWN)" PR_TYPE_SUFFIX);
+            result = snprintf(buffer, length,
+                              PR_TYPE_PREFIX "(UNKNOWN)" PR_TYPE_SUFFIX);
+            break;
     }
+
+    return result > 0 ? (size_t)result : 0;
 }
 
 
@@ -188,6 +190,8 @@ pr_Pointer_sput(const pr_Pointer *self,
 size_t
 pr_Pointer_sput_len(const pr_Pointer *self)
 {
+    int result;
+
     if (!self)
         return sizeof PR_PREFIX "(NULL)" PR_SUFFIX;
 
@@ -196,21 +200,27 @@ pr_Pointer_sput_len(const pr_Pointer *self)
     switch (PR_GET_TYPE(self))
     {
         case pr_Pointer_NONE:
-            return sizeof PR_TYPE_PREFIX "pr_Pointer_NONE" PR_TYPE_SUFFIX;
+            result = sizeof PR_TYPE_PREFIX "pr_Pointer_NONE" PR_TYPE_SUFFIX;
+            break;
 
         case pr_Pointer_DATA:
-            return (size_t)snprintf(NULL, 0,
-                                    PR_TYPE_PREFIX "pr_Pointer_DATA"
-                                    PR_DATA_INFIX "%p" PR_TYPE_SUFFIX,
-                                    PR_GET(self, data));
+            result = snprintf(NULL, 0,
+                              PR_TYPE_PREFIX "pr_Pointer_DATA"
+                                  PR_DATA_INFIX "%p" PR_TYPE_SUFFIX,
+                                  PR_GET(self, data));
+            break;
 
         case pr_Pointer_FUNC:
-            return sizeof PR_TYPE_PREFIX "pr_Pointer_FUNC"
-                          PR_FUNC_INFIX "(function)" PR_TYPE_SUFFIX;
+            result = sizeof PR_TYPE_PREFIX "pr_Pointer_FUNC"
+                         PR_FUNC_INFIX "(function)" PR_TYPE_SUFFIX;
+            break;
 
         default:
-            return sizeof PR_TYPE_PREFIX "(UNKNOWN)" PR_TYPE_SUFFIX;
+            result = sizeof PR_TYPE_PREFIX "(UNKNOWN)" PR_TYPE_SUFFIX;
+            break;
     }
+
+    return result > 0 ? (size_t)result : 0;
 }
 
 

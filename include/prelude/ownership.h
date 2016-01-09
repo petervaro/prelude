@@ -74,6 +74,6 @@ pr_Ownership_sput_len(pr_Ownership self);
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* This value represents the maximum buffer length required to store the
    qualified representation of ownership */
-#define PR_OWNERSHIP_MAX_SPUT_LEN ((size_t)259)
+#define PR_OWNERSHIP_MAX_SPUT_LEN 259
 
 #endif /* PR_OWNERSHIP_H_4129475682998757 */

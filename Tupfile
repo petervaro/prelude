@@ -15,9 +15,6 @@ lib = prelude
 
 
 #------------------------------------------------------------------------------#
-# Analyze sources
-: foreach $(SOURCE_DIR)/*.c $(INCLUDE_DIR)/prelude/*.h |> !analyze |>
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 # Compile objects
 : foreach $(SOURCE_DIR)/*.c                                                    \
     |> !to_obj                                                                 \
@@ -72,3 +69,12 @@ VALGRIND += --soname-synonyms=somalloc=*jemalloc*
 : foreach tests/main-*.c                                                   \
     |> !to_cpp                                                             \
     |> $(BUILD_DIR)/cpp-out/tests/%B.pp.%e
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# Analyze sources
+: foreach $(SOURCE_DIR)/*.c          |> !analyze |>
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# Analyze headers
+CFLAGS += -Wno-unused-macros
+: foreach $(INCLUDE_DIR)/prelude/*.h |> !analyze |>

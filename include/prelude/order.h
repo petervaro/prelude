@@ -74,7 +74,7 @@ pr_Order_sput_len(pr_Order self);
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* This value represents the maximum buffer length required to store the
    qualified representation of order */
-#define PR_ORDER_MAX_SPUT_LEN ((size_t)33)
+#define PR_ORDER_MAX_SPUT_LEN 33
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Return : the opposite value of the passed order. For example, if pr_EQUAL

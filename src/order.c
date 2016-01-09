@@ -13,6 +13,8 @@
             strlen */
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+#include "prelude/_internal.h"
+/*  func  : min */
 #include "prelude/order.h"
 /*  type  : pr_Order */
 
@@ -58,7 +60,7 @@ pr_Order_str(pr_Order self)
     else if (self == pr_UNCOMPARABLE)       return pr_ORDERS[4];
     else if (self == pr_UNCOMPARABLE_LEFT)  return pr_ORDERS[5];
     else if (self == pr_UNCOMPARABLE_RIGHT) return pr_ORDERS[6];
-    else                                     return pr_ORDERS[7];
+    else                                    return pr_ORDERS[7];
 }
 
 
@@ -70,7 +72,7 @@ pr_Order_fput(pr_Order  self,
 {
     /* If stream is NULL */
     if (!stream)
-        return (size_t)0;
+        return 0;
 
     /* Print qualified representation */
     fputs(PR_PREFIX, stream);
@@ -98,8 +100,6 @@ pr_Order_sput(pr_Order  self,
               size_t    length,
               char     *buffer)
 {
-    #define min(a, b) ((a) < (b) ? (a) : (b))
-
     /* Local variables */
     size_t start,
            required;
@@ -107,7 +107,7 @@ pr_Order_sput(pr_Order  self,
     /* If length is 0 or buffer is NULL */
     if (!length ||
         !buffer)
-            return (size_t)0;
+            return 0;
 
     /* Wrire prefix to buffer */
     start = --length;
@@ -132,8 +132,6 @@ pr_Order_sput(pr_Order  self,
 
     /* Return the number of bytes that has been written to stream */
     return start - length;
-
-    #undef min
 }
 
 

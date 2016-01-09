@@ -20,6 +20,8 @@
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include prelude headers */
+#include "prelude/_internal.h"
+/*  func  : min */
 #include "prelude/ownership.h"
 /*  type  : pr_Ownership */
 
@@ -120,7 +122,7 @@ pr_Ownership_fput(pr_Ownership  self,
     #ifndef PR_FAST
         /* If stream is NULL */
         if (!stream)
-            return (size_t)0;
+            return 0;
     #endif
 
     /* Print representation */
@@ -170,8 +172,6 @@ pr_Ownership_sput(pr_Ownership  self,
                   size_t        length,
                   char         *buffer)
 {
-    #define min(a, b) ((a) < (b) ? (a) : (b))
-
     /* Local variables */
     int    i;
     bool   nth;
@@ -181,7 +181,7 @@ pr_Ownership_sput(pr_Ownership  self,
     /* If length is 0 or buffer is NULL */
     if (!length ||
         !buffer)
-            return (size_t)0;
+            return 0;
 
     /* Write prefix to buffer */
     start = --length;
@@ -246,8 +246,6 @@ pr_Ownership_sput(pr_Ownership  self,
 
     /* Return the number of bytes that has been written to stream */
     return start - length;
-
-    #undef min
 }
 
 

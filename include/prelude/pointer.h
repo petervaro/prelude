@@ -10,15 +10,15 @@
     This header contains the necessary types, their methods and macros to
     implement such feature.
 
-    The rationale behind this type is that the plain pointer to void may or may
-    not have the same size as a function pointer. (A pointer to void is only
-    capable of storing any type of object pointer, not function pointer. Also
-    the representation of a pointer to function is implementation defined.)
-    Therefore it is not conforming and portable to store pointer to function in
-    pointer to void. However the standard clearly states, that any pointer to a
-    function is capable of holding pointer to any kind of other function. (Even
-    then, the stored function should not be called until it is properly casted
-    first, otherwise it is undefined behaviour.) */
+    The rationale behind this type is that it is not guaranteed for a plain
+    pointer to void to have the same size and/or representation as a function
+    pointer. (A pointer to void is only capable of storing any type of object
+    pointer.) Therefore it is not strictly conforming to store a pointer to
+    function in a pointer to void. However the standard clearly states, that any
+    pointer to a function is capable of holding pointer to any kind of other
+    function. (Even then, the stored function should not be called until it is
+    properly casted first to its original type, otherwise it is undefined
+    behaviour. */
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include standard headers */
@@ -321,7 +321,7 @@ pr_Pointer_sput_len(const pr_Pointer *self);
 /* TODO: find a away to tell the max value during compilation */
 /* This value represents the maximum buffer length required to store the
    qualified representation of pointer */
-// #define PR_POINTER_MAX_SPUT_LEN ((size_t)259)
+// #define PR_POINTER_MAX_SPUT_LEN 000
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /*  Compare two pr_Pointer instances to each other.
