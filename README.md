@@ -589,7 +589,7 @@ void pr_assert_x(<scalar>    expression,
                  const char *expression_string,
                  const char *message);
 ```
-Works the same as `pr_assert_x`, except it takes the expression as a string for
+Works the same as `pr_assert`, except it takes the expression as a string for
 its second argument. This form can be be used, to prevent macro replacement,
 when `pr_assert_x` is wrapped with a macro.  The `expression_string` should not
 be a pointer to `NULL`.

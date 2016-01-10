@@ -45,14 +45,14 @@ lib = prelude
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 # Build test binaries
-LIBS  = -l$(lib)
+LIBS += -l$(lib)
 LIBS += -ljemalloc
 : foreach {bin_obj} | {lib}                                                    \
     |> !to_bin $(LIBS)                                                         \
     |> $(BINARY_DIR)/tests/%B$(BIN_EXT) {bin}
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
-ENV_VARS = LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(LIBRARY_DIR)
+ENV_VARS += LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(LIBRARY_DIR)
 VALGRIND += --soname-synonyms=somalloc=*jemalloc*
 : foreach {bin} | {lib} |> !run_it |>
 
@@ -72,7 +72,7 @@ VALGRIND += --soname-synonyms=somalloc=*jemalloc*
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 # Analyze sources
-: foreach $(SOURCE_DIR)/*.c          |> !analyze |>
+: foreach $(SOURCE_DIR)/*.c |> !analyze |>
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 # Analyze headers

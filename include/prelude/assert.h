@@ -26,15 +26,16 @@
 #ifdef NDEBUG
     #define pr_assert(EXPRESSION, MESSAGE) ((void)0)
 #else
-    #define pr_assert_x(EXPRESSION, EXPRESSION_STRING, MESSAGE)                \
-        for (; !(EXPRESSION); exit(EXIT_FAILURE))                              \
+    #define pr_assert_x(EXPRESSION, EXPRESSION_LITERAL, MESSAGE)               \
+        ((!(EXPRESSION)) ? (                                                   \
             fprintf(stderr, "%s\n%s%d%s%s%s\n",                                \
                     MESSAGE,                                                   \
                     __FILE__ ":",                                              \
                     __LINE__,                                                  \
-                     ": ",                                                     \
+                    ": ",                                                      \
                     __func__,                                                  \
-                    " Assertion `" EXPRESSION_STRING "' failed.")
+                    " Assertion `" EXPRESSION_LITERAL "' failed."),            \
+             exit(EXIT_FAILURE)) : (void)0)
     #define pr_assert(EXPRESSION, MESSAGE)                                     \
         pr_assert_x(EXPRESSION, #EXPRESSION, MESSAGE)
 #endif /* NDEBUG */
