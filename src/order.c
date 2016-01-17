@@ -2,21 +2,30 @@
 ** INFO */
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Include standard headers */
 #include <stdio.h>
 /*  type  : FILE
     value : stdout
     func  : ftell
             fputs
             fputc */
+#include <stddef.h>
+/*  type  : size_t */
 #include <string.h>
 /*  func  : memcpy
             strlen */
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-#include "prelude/_internal.h"
-/*  func  : min */
+/* Include prelude headers */
 #include "prelude/order.h"
 /*  type  : pr_Order */
+#include "prelude/definitions.h"
+/*  macro : PR_DEF_MIN */
+
+
+/*----------------------------------------------------------------------------*/
+/* Define function */
+PR_DEF_MIN(min, size_t, static inline)
 
 /*----------------------------------------------------------------------------*/
 /* Module level constants */

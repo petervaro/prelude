@@ -20,10 +20,15 @@
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include prelude headers */
-#include "prelude/_internal.h"
-/*  func  : min */
 #include "prelude/ownership.h"
 /*  type  : pr_Ownership */
+#include "prelude/definitions.h"
+/*  macro : PR_DEF_MIN */
+
+
+/*----------------------------------------------------------------------------*/
+/* Define function */
+PR_DEF_MIN(min, size_t, static inline)
 
 
 /*----------------------------------------------------------------------------*/

@@ -26,7 +26,6 @@
 
 /*----------------------------------------------------------------------------*/
 #ifdef NDEBUG
-    #define pr_assert(EXPRESSION, MESSAGE)                       ((void)0)
     #define pr_assert_x(EXPRESSION, EXPRESSION_LITERAL, MESSAGE) ((void)0)
 #else
     #define pr_assert_x(EXPRESSION, EXPRESSION_LITERAL, MESSAGE)               \
@@ -40,8 +39,9 @@
                     ": Assertion `" EXPRESSION_LITERAL "' failed."),           \
              fflush(NULL),                                                     \
              abort()) : (void)0)
-    #define pr_assert(EXPRESSION, MESSAGE)                                     \
-        pr_assert_x(EXPRESSION, #EXPRESSION, MESSAGE)
 #endif /* NDEBUG */
+
+#define pr_assert(EXPRESSION, MESSAGE)                                         \
+    pr_assert_x(EXPRESSION, #EXPRESSION, MESSAGE)
 
 #endif /* PR_ASSERT_H_8765756491050648 */

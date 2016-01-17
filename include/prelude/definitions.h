@@ -5,6 +5,12 @@
 #ifndef PR_DEFINITIONS_H_1761445857113696
 #define PR_DEFINITIONS_H_1761445857113696 1
 
+/* Macros to define type specific `min` and `max` functions.
+
+   NOTE: PR_DEF_*_ORDER macros requires the <prelude/order.h> header file to be
+         included (because of the constants: pr_LESSER and pr_GREATER) */
+
+
 /*----------------------------------------------------------------------------*/
 #define PR_DEF_MIN_H(NAME, TYPE, QUAL)                                         \
     QUAL TYPE                                                                  \
