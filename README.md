@@ -9,8 +9,8 @@
 higher-level but low-cost abstractions in strictly conforming C. The types,
 their methods and unified values can be used to decide comparison ordering; to
 indicate *proxy* objects' ownership of their members; to store any pointer in a
-truly generic pointer type; and to pass message along with the scalar expression
-to an assertion.
+truly generic pointer type; to pass message along with the scalar expression to
+an assertion; and to define type specific minimum/maximum functions.
 
 - [Dependencies](#dependencies)
 - [Install](#install)
@@ -19,6 +19,7 @@ to an assertion.
 - [Ownership of Members](#ownership-of-members)
 - [Generic Pointer](#generic-pointer)
 - [Assertion](#assertion)
+- [Definitions](#definitions)
 - [License](#license)
 
 
@@ -108,7 +109,7 @@ and bit-mask unfolding.
 #include <prelude/order.h>
 ```
 
-And link against either `libprelude.so` or `libprelude.a`.
+Also it requeries to be linked against either `libprelude.a` or `libprelude.so`.
 
 **Available `pr_Order` constants:**
 
@@ -267,7 +268,7 @@ can be allocated completely statically or completely dynamically or mixed.
 #include <prelude/ownership.h>
 ```
 
-And link against either `libprelude.so` or `libprelude.a`.
+Also it requeries to be linked against either `libprelude.a` or `libprelude.so`.
 
 **Available `pr_Ownership` constants:**
 
@@ -392,7 +393,7 @@ first to its original type, otherwise it is undefined behaviour.)
 #include <prelude/pointer.h>
 ```
 
-And link against either `libprelude.so` or `libprelude.a`.
+Also it requeries to be linked against either `libprelude.a` or `libprelude.so`.
 
 **Available constants:**
 
@@ -564,6 +565,8 @@ pr_Pointer_hash(const pr_Pointer *self);
 Assertion
 ---------
 
+Improved versions of the standard library's assertion macro.
+
 **Usage:**
 
 ```C
@@ -593,6 +596,98 @@ Works the same as `pr_assert`, except it takes the expression as a string for
 its second argument. This form can be be used, to prevent macro replacement,
 when `pr_assert_x` is wrapped with a macro.  The `expression_string` should not
 be a pointer to `NULL`.
+
+
+
+Definitions
+-----------
+
+Macros to define type specific functions.
+
+**Usage:**
+
+```C
+#include <prelude/definitions.h>
+```
+
+> **NOTE:** Using this header alone does not require to link against either
+> `libprelude.a` or `libprelude.so`.
+
+**Available macros:**
+
+> **IMPORTANT:** Macros should be invoked without trailing `;` (*semi-colon*)!
+
+```C
+#define PR_DEF_MIN(NAME, TYPE, QUAL)
+```
+Defines a new function, with the name `NAME`, which takes two scalar arguments
+with types `TYPE` and returns the lesser one of them. The function can
+optionally be qualified with `QUAL`. (For example:
+`PR_DEF_MIN(T_min, T, static)`.) To ommit the last argument one can provide a
+trailing `,` (*comma*) at the end of the arguments list. (For example:
+`PR_DEF_MIN(T_min, T,)`.)
+
+```C
+#define PR_DEF_MIN_H(NAME, TYPE, QUAL)
+```
+Same as `PF_DEF_MIN`, except this macro defines the function prototype, which
+makes this a perfect candidate to put in a header file.
+
+```C
+#define PR_DEF_MAX(NAME, TYPE, QUAL)
+```
+Defines a new function, with the name `NAME`, which takes two scalar arguments
+with types `TYPE` and returns the greater one of them. The function can
+optionally be qualified with `QUAL`. (For example:
+`PR_DEF_MAX(T_max, T, static)`.) To ommit the last argument one can provide a
+trailing `,` (*comma*) at the end of the arguments list. (For example:
+`PR_DEF_MAX(T_max, T,)`.)
+
+```C
+#define PR_DEF_MAX_H(NAME, TYPE, QUAL)
+```
+Same as `PF_DEF_MAX`, except this macro defines the function prototype, which
+makes this a perfect candidate to put in a header file.
+
+```C
+#define PR_DEF_MIN_ORDER(NAME, TYPE, COMPARE, QUAL)
+```
+Defines a new function, with the name `NAME`, which takes two arbitrary
+arguments with types `TYPE` and returns the lesser one of them. The comparison
+is done by the function `COMPARE`, which uses the `prelude/order.h` constants to
+indicate the state of the comparison. The function can optionally be qualified
+with `QUAL`. (For example: `PR_DEF_MIN_ORDER(T_min, T, T_cmp, static)`.) To
+ommit the last argument one can provide a trailing `,` (*comma*) at the end of
+the arguments list. (For example: `PR_DEF_MIN_ORDER(T_min, T, T_cmp,)`.)
+
+> **NOTE:** Before this definition can be used, `<prelude/order.h>` must be
+> included.
+
+```C
+#define PR_DEF_MIN_ORDER_H(NAME, TYPE, QUAL)
+```
+Same as `PF_DEF_MIN_ORDER`, except this macro defines the function prototype,
+which makes this a perfect candidate to put in a header file.
+
+```C
+#define PR_DEF_MAX_ORDER(NAME, TYPE, COMPARE, QUAL)
+```
+Defines a new function, with the name `NAME`, which takes two arbitrary
+arguments with types `TYPE` and returns the greater one of them. The comparison
+is done by the function `COMPARE`, which uses the `prelude/order.h` constants to
+indicate the state of the comparison. The function can optionally be qualified
+with `QUAL`. (For example: `PR_DEF_MAX_ORDER(T_max, T, T_cmp, static)`.) To
+ommit the last argument one can provide a trailing `,` (*comma*) at the end of
+the arguments list. (For example: `PR_DEF_MAX_ORDER(T_max, T, T_cmp,)`.)
+
+> **NOTE:** Before this definition can be used, `<prelude/order.h>` must be
+> included.
+
+```C
+#define PR_DEF_MAX_ORDER_H(NAME, TYPE, QUAL)
+```
+Same as `PF_DEF_MAX_ORDER`, except this macro defines the function prototype,
+which makes this a perfect candidate to put in a header file.
 
 
 

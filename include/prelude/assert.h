@@ -17,14 +17,17 @@
 /* Include standard headers */
 #include <stdio.h>
 /*  value : stderr
-    func  : fprintf */
+    func  : fflush
+            fprintf */
+#include <stddef.h>
+/*  macro : NULL */
 #include <stdlib.h>
-/*  const : EXIT_FAILURE
-    func  : exit */
+/*  func  : abort */
 
 /*----------------------------------------------------------------------------*/
 #ifdef NDEBUG
-    #define pr_assert(EXPRESSION, MESSAGE) ((void)0)
+    #define pr_assert(EXPRESSION, MESSAGE)                       ((void)0)
+    #define pr_assert_x(EXPRESSION, EXPRESSION_LITERAL, MESSAGE) ((void)0)
 #else
     #define pr_assert_x(EXPRESSION, EXPRESSION_LITERAL, MESSAGE)               \
         ((!(EXPRESSION)) ? (                                                   \
@@ -34,8 +37,9 @@
                     __LINE__,                                                  \
                     ": ",                                                      \
                     __func__,                                                  \
-                    " Assertion `" EXPRESSION_LITERAL "' failed."),            \
-             exit(EXIT_FAILURE)) : (void)0)
+                    ": Assertion `" EXPRESSION_LITERAL "' failed."),           \
+             fflush(NULL),                                                     \
+             abort()) : (void)0)
     #define pr_assert(EXPRESSION, MESSAGE)                                     \
         pr_assert_x(EXPRESSION, #EXPRESSION, MESSAGE)
 #endif /* NDEBUG */
