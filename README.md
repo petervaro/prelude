@@ -1,9 +1,9 @@
-![[license: GPLv3]](https://img.shields.io/badge/license-GNU_General_Public_License_v3.0-blue.svg)
-![[standard: ISO C11]](https://img.shields.io/badge/standard-ISO_C11-lightgrey.svg)
+[![[license: GPLv3]][1]][2]
+[![[standard: ISO C11]][3]][4]
 
 - - -
 
-![prelude](img/logo.png?raw=true "logo")
+![prelude][5]
 
 `prelude` is a tiny package, that contains essential definitions for
 higher-level but low-cost abstractions in strictly conforming C. The types,
@@ -715,3 +715,11 @@ The font used in the logo is called **Cinzel**. It is licensed under the
 [SIL Open Font License v1.10](http://scripts.sil.org/OFL).
 
 Copyright &copy; 2012 **Natanael Gama**
+
+<!-- -->
+
+[1]: https://img.shields.io/badge/license-GNU_General_Public_License_v3.0-blue.svg
+[2]: http://www.gnu.org/licenses/gpl.html
+[3]: https://img.shields.io/badge/standard-ISO_C11-lightgrey.svg
+[4]: http://www.open-std.org/jtc1/sc22/WG14/www/docs/n1570.pdf
+[5]: img/logo.png?raw=true "Prelude in C"
